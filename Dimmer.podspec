@@ -39,6 +39,8 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'UIViewKVO'
-  s.dependecny 'TinyLog'
+  s.dependency 'FadeView'
+  s.dependency 'TinyLog'
   s.dependency 'PureLayout'
+  s.dependency 'OptionalTypes'
 end

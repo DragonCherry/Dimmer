@@ -1,21 +1,27 @@
 //
-//  UIView+Loading.swift
+//  UIView+Dimmer.swift
 //  Pods
 //
-//  Created by DragonCherry on 3/17/17.
+//  Created by DragonCherry on 5/12/17.
 //
 //
 
 import UIKit
 import TinyLog
-import PureLayout
 import UIViewKVO
+import FadeView
+import PureLayout
+import OptionalTypes
 
-fileprivate let kDimmerLayoutConstraints		= "kUIViewAttachLayoutConstraints"
-fileprivate let kUIViewAttachActivityIndicator      = "kUIViewAttachActivityIndicator"
-fileprivate let kUIViewAttachActivityIndicatorDim   = "kUIViewAttachActivityIndicatorDim"
+fileprivate let kDimmerView                             = "kDimmerView"
+fileprivate let kDimmerViewRatio                        = "kDimmerViewRatio"
+fileprivate let kDimmerActivityIndicatorView            = "kDimmerActivityIndicatorView"
 
-public enum UIViewEffectDirection {
+fileprivate let kDimmerLayoutConstraints                = "kDimmerLayoutConstraints"
+fileprivate let kDimmerWidthConstraint                  = "kDimmerWidthConstraint"
+fileprivate let kDimmerHeightConstraint                 = "kDimmerHeightConstraint"
+
+public enum DimmerEffectDirection {
     case solid
     case fromTop
     case fromLeft
@@ -23,155 +29,193 @@ public enum UIViewEffectDirection {
     case fromRight
 }
 
-fileprivate let kUIViewDimViewIdentifier = "kUIViewDimViewIdentifier"
-fileprivate let kUIViewDimRatioIdentifier = "kUIViewDimRatioIdentifier"
-
-public extension UIView {
+// MARK: - Internal Utilities
+extension UIView {
     
-    public func showLoading(alpha: CGFloat = 0, style: UIActivityIndicatorViewStyle = .gray) {
-        if let _ = self.viewForKey(kUIViewAttachActivityIndicator) {
-            // do nothing
-        } else {
-            let dim = UIView(frame: bounds)
-            attach(dim, key: kUIViewAttachActivityIndicatorDim)
-            dim.backgroundColor = .black
-            dim.alpha = alpha
-            dim.autoPinEdgesToSuperviewEdges()
-            
-            let indicator = UIActivityIndicatorView(activityIndicatorStyle: style)
-            attach(indicator, key: kUIViewAttachActivityIndicator)
-            indicator.startAnimating()
-            indicator.autoSetDimensions(to: CGSize(width: 40, height: 40))
-            indicator.autoCenterInSuperview()
+    fileprivate var dimmerConstraints: NSArray? {
+        set { set(newValue, forKey: kDimmerLayoutConstraints) }
+        get { return get(kDimmerLayoutConstraints) as? NSArray }
+    }
+    
+    fileprivate var dimmerWidthConstraint: NSLayoutConstraint? {
+        set { set(newValue, forKey: kDimmerWidthConstraint) }
+        get { return get(kDimmerWidthConstraint) as? NSLayoutConstraint }
+    }
+    
+    fileprivate var dimmerHeightConstraint: NSLayoutConstraint? {
+        set { set(newValue, forKey: kDimmerHeightConstraint) }
+        get { return get(kDimmerHeightConstraint) as? NSLayoutConstraint }
+    }
+    
+    fileprivate func setupConstraints(constraints: NSArray?) {
+        dimmerConstraints?.autoRemoveConstraints()
+        constraints?.autoInstallConstraints()
+        dimmerConstraints = constraints
+    }
+    
+    fileprivate func createDimmerView(alpha: CGFloat = 0.4) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.alpha = alpha
+        return view
+    }
+    
+    fileprivate func createDimmerActivityView(style: UIActivityIndicatorViewStyle = .gray) -> UIActivityIndicatorView {
+        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: style)
+        return activityIndicator
+    }
+    
+    fileprivate func excludingEdge(with direction: DimmerEffectDirection) -> ALEdge {
+        switch direction {
+        case .fromTop:
+            return .bottom
+        case .fromLeft:
+            return .right
+        case .fromBottom:
+            return .top
+        case .fromRight:
+            return .left
+        case .solid:
+            return .left
         }
     }
     
-    public func loadingDimView() -> UIView? {
-        return viewForKey(kUIViewAttachActivityIndicatorDim)
-    }
-    
-    public func loadingIndicatorView() -> UIView? {
-        return viewForKey(kUIViewAttachActivityIndicator)
-    }
-    
-    public func hideLoading() {
-        if let _ = viewForKey(kUIViewAttachActivityIndicator) {
-            _ = detach(key: kUIViewAttachActivityIndicator, fade: true)
-        }
-        if let _ = viewForKey(kUIViewAttachActivityIndicatorDim) {
-            _ = detach(key: kUIViewAttachActivityIndicatorDim, fade: true)
-        }
+    fileprivate func clearKVO() {
+        
+        dimmerView?.removeFromSuperview()
+        dimmerActivityView?.removeFromSuperview()
+        
+        dimmerConstraints = nil
+        dimmerWidthConstraint = nil
+        dimmerHeightConstraint = nil
+        
+        set(nil, forKey: kDimmerView)
+        set(nil, forKey: kDimmerActivityIndicatorView)
+        set(nil, forKey: kDimmerViewRatio)
     }
 }
 
-
-
-public extension UIView {
-
-    public var dimmer: UIView {
-        let view = UIView()
-	
-	return view
+// MARK: - Exposed APIs
+extension UIView {
+    
+    open var dimmingRatio: CGFloat {
+        get { return CGFloat(get(kDimmerViewRatio)) }
+        set { set(newValue, forKey: kDimmerViewRatio) }
+    }
+    open var isDimming: Bool {
+        if let dimmerView = dimmerView, !dimmerView.isHidden && dimmingRatio > 0 {
+            return true
+        } else {
+            return false
+        }
     }
     
-    public func dim(_ from: UIViewEffectDirection = .solid, ratio: CGFloat = 1, alpha: CGFloat = 0.4, duration: TimeInterval = 0.25, completion: ((CGFloat) -> Void)? = nil) {
-        
-        func moveDimView(_ dimView: UIView) {
-            var fixedRatio: CGFloat = ratio
-            if ratio > 1 {
-                fixedRatio = 1
-            }
-            if ratio < 0 {
-                fixedRatio = 0
-            }
-            
-            UIView.animate(
-                withDuration: duration,
-                delay: 0,
-                options: UIViewAnimationOptions.curveEaseOut,
-                animations: {
-                    
-                    var origin: CGPoint!
-                    var dimWidth: CGFloat = 0
-                    var dimHeight: CGFloat = 0
-                    
-                    switch from {
-                    case .solid:
-                        dimWidth = self.bounds.width
-                        dimHeight = self.bounds.height
-                    case .fromTop, .fromBottom:
-                        dimWidth = self.bounds.width
-                        dimHeight = fixedRatio * self.height
-                    case .fromLeft, .fromRight:
-                        dimWidth = fixedRatio * self.width
-                        dimHeight = self.bounds.height
-                    }
-                    
-                    switch from {
-                    case .solid, .fromTop, .fromLeft:
-                        origin = CGPoint.zero
-                    case .fromBottom:
-                        origin = CGPoint(x: 0, y: self.height - dimHeight)
-                    case .fromRight:
-                        origin = CGPoint(x: self.width - dimWidth, y: 0)
-                    }
-                    
-                    dimView.frame = CGRect(origin: origin, size: CGSize(width: dimWidth, height: dimHeight))
-                    self.set(fixedRatio, forKey: kUIViewDimRatioIdentifier)
-                    
-                }, completion: { finished in
-                    if finished {
-                        completion?(fixedRatio)
+    open var isLoading: Bool {
+        if let _ = get(kDimmerActivityIndicatorView), dimmingRatio > 0 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    open var dimmerView: UIView? {
+        get { return get(kDimmerView) as? UIView }
+        set {
+            if let newDimmerView = newValue {
+                if let oldDimmerView = dimmerView {
+                    if oldDimmerView !== newDimmerView {
+                        clearKVO()
                     }
                 }
-            )
-            set(cgfloat(fixedRatio), forKey: kUIViewDimRatioIdentifier)
+                set(newDimmerView, forKey: kDimmerView)
+            } else {
+                if let _ = dimmerView {
+                    clearKVO()
+                }
+            }
+        }
+    }
+    
+    open var dimmerActivityView: UIView? {
+        get { return get(kDimmerActivityIndicatorView) as? UIView }
+        set {
+            if let newDimmerActivityView = newValue {
+                if let oldDimmerActivityView = dimmerActivityView {
+                    if oldDimmerActivityView !== newDimmerActivityView {
+                        clearKVO()
+                    }
+                }
+                set(newDimmerActivityView, forKey: kDimmerActivityIndicatorView)
+            } else {
+                if let _ = dimmerActivityView {
+                    clearKVO()
+                }
+            }
+        }
+    }
+    
+    open func dim(_ direction: DimmerEffectDirection = .solid, ratio: CGFloat = 1, alpha: CGFloat = 0.4, completion: ((CGFloat) -> Void)? = nil) {
+        
+        let updateRatio: (() -> Void) = {
+            if self.dimmingRatio != ratio {
+                switch direction {
+                case .fromTop, .fromBottom:
+                    self.dimmerHeightConstraint?.constant = self.frame.size.height * ratio
+                case .fromLeft, .fromRight:
+                    self.dimmerWidthConstraint?.constant = self.frame.size.width * ratio
+                default:
+                    break
+                }
+                self.dimmingRatio = ratio
+            }
         }
         
-        if let dimView = viewForKey(kUIViewDimViewIdentifier) {
-            moveDimView(dimView)
+        if let _ = self.dimmerView {
+            updateRatio()
         } else {
-            
-            let dimView = UIView(frame: CGRect(origin: CGPoint.zero, size: bounds.size))
-            dimView.alpha = alpha
-            dimView.backgroundColor = .black
-            
-            var origin: CGPoint!
-            var dimWidth: CGFloat = 0
-            var dimHeight: CGFloat = 0
-
-            switch from {
-            case .solid, .fromTop, .fromLeft:
-                origin = CGPoint.zero
-            case .fromBottom:
-                origin = CGPoint(x: 0, y: height)
-            case .fromRight:
-                origin = CGPoint(x: width, y: 0)
-            }
-            
-            switch from {
-            case .solid:
-                dimWidth = bounds.width
-                dimHeight = bounds.height
-            case .fromTop, .fromBottom:
-                dimWidth = bounds.width
-                dimHeight = 0
-            case .fromLeft, .fromRight:
-                dimWidth = 0
-                dimHeight = bounds.height
-            }
-            
-            dimView.frame = CGRect(origin: origin, size: CGSize(width: dimWidth, height: dimHeight))
-            attach(dimView, key: kUIViewDimViewIdentifier)
-            moveDimView(dimView)
+            let dimmer = createDimmerView(alpha: alpha)
+            fadeInSubview(dimmer)
+            dimmerConstraints = NSLayoutConstraint.autoCreateConstraintsWithoutInstalling {
+                if direction == .solid {
+                    dimmer.autoPinEdgesToSuperviewEdges()
+                } else {
+                    dimmer.autoPinEdgesToSuperviewEdges(with: UIEdgeInsets(), excludingEdge: self.excludingEdge(with: direction))
+                    switch direction {
+                    case .fromTop, .fromBottom:
+                        dimmerHeightConstraint = dimmer.autoSetDimension(.height, toSize: self.frame.size.height * ratio)
+                    case .fromLeft, .fromRight:
+                        dimmerWidthConstraint = dimmer.autoSetDimension(.width, toSize: self.frame.size.width * ratio)
+                    default:
+                        break
+                    }
+                }
+            } as NSArray
+            dimmerView = dimmer
+            setupConstraints(constraints: dimmerConstraints)
+            updateRatio()
         }
     }
     
-    public func undim(_ animated: Bool = true) {
-        detach(key: kUIViewDimViewIdentifier, fade: animated)
+    open func undim() {
+        dimmerView?.fadeOutFromSuperview(completion: {
+            self.clearKVO()
+        })
     }
     
-    public func dimRatio() -> CGFloat {
-        return cgfloat(get(kUIViewDimRatioIdentifier))
+    open func showLoading(alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+        dim(.solid, alpha: alpha)
+        if let _ = self.dimmerActivityView {
+            // already loading
+        } else {
+            let dimmerActivity = createDimmerActivityView(style: style)
+            fadeInSubview(dimmerActivity)
+            dimmerActivity.autoCenterInSuperview()
+            dimmerActivity.startAnimating()
+            dimmerActivityView = dimmerActivity
+        }
+    }
+    
+    open func hideLoading() {
+        undim()
     }
 }
