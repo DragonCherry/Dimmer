@@ -1,2 +1,2 @@
 # Dimmer
-An easy extension library that support dimming functionality.
+An easy extension library that supports dimming functionality on UIView and UIViewController.
