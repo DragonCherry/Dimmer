@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Dimmer_Example' do
+  pod 'Dimmer', :path => '../'
+
+  target 'Dimmer_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
