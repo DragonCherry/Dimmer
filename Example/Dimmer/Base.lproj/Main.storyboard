@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
     <device id="retina3_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -22,7 +22,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kbU-tI-oWe">
-                                <rect key="frame" x="0.0" y="430" width="159.5" height="50"/>
+                                <rect key="frame" x="0.0" y="430" width="160" height="50"/>
                                 <color key="backgroundColor" red="0.69019607839999997" green="1" blue="0.83921568629999999" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="6q0-dZ-YJ7"/>
@@ -37,7 +37,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xgk-FQ-MYz">
-                                <rect key="frame" x="160.5" y="430" width="159.5" height="50"/>
+                                <rect key="frame" x="160" y="430" width="160" height="50"/>
                                 <color key="backgroundColor" red="0.76470588240000004" green="0.89411764709999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Dim with Loading"/>
                                 <connections>
@@ -51,7 +51,7 @@
                             <constraint firstAttribute="trailing" secondItem="Xgk-FQ-MYz" secondAttribute="trailing" id="M5h-gw-0ww"/>
                             <constraint firstItem="wqZ-XH-Mdr" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="MvE-m3-1Ur"/>
                             <constraint firstItem="kbU-tI-oWe" firstAttribute="width" secondItem="Xgk-FQ-MYz" secondAttribute="width" id="SQS-B8-U3d"/>
-                            <constraint firstItem="Xgk-FQ-MYz" firstAttribute="leading" secondItem="kbU-tI-oWe" secondAttribute="trailing" constant="1" id="UxI-3i-bot"/>
+                            <constraint firstItem="Xgk-FQ-MYz" firstAttribute="leading" secondItem="kbU-tI-oWe" secondAttribute="trailing" id="UxI-3i-bot"/>
                             <constraint firstItem="Xgk-FQ-MYz" firstAttribute="width" secondItem="kbU-tI-oWe" secondAttribute="width" id="X8a-JD-KE5"/>
                             <constraint firstItem="wqZ-XH-Mdr" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="Z4Y-y8-Rl9"/>
                             <constraint firstItem="Xgk-FQ-MYz" firstAttribute="height" secondItem="kbU-tI-oWe" secondAttribute="height" id="ZCt-zZ-mIB"/>
