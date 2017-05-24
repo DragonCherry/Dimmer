@@ -53,9 +53,9 @@ extension UIView {
         dimmerConstraints = constraints
     }
     
-    fileprivate func createDimmerView(alpha: CGFloat = 0.4) -> UIView {
+    fileprivate func createDimmerView(color: UIColor = .black, alpha: CGFloat = 0.4) -> UIView {
         let view = UIView()
-        view.backgroundColor = .black
+        view.backgroundColor = color
         view.alpha = alpha
         return view
     }
@@ -154,7 +154,7 @@ extension UIView {
         }
     }
     
-    open func dim(animated: Bool = true, direction: DimmerEffectDirection = .solid, ratio: CGFloat = 1, alpha: CGFloat = 0.4, completion: ((CGFloat) -> Void)? = nil) {
+    open func dim(animated: Bool = true, direction: DimmerEffectDirection = .solid, color: UIColor = .black, alpha: CGFloat = 0.4, ratio: CGFloat = 1, completion: ((CGFloat) -> Void)? = nil) {
         
         let updateRatio: (() -> Void) = {
             if self.dimmingRatio != ratio {
@@ -173,7 +173,7 @@ extension UIView {
         if let _ = self.dimmerView {
             updateRatio()
         } else {
-            let dimmer = createDimmerView(alpha: alpha)
+            let dimmer = createDimmerView(color: color, alpha: alpha)
             if animated {
                 fadeInSubview(dimmer)
             } else {
@@ -211,8 +211,8 @@ extension UIView {
         }
     }
     
-    open func showLoading(animated: Bool = true, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
-        dim(animated: animated, direction: .solid, alpha: alpha)
+    open func showLoading(animated: Bool = true, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+        dim(animated: animated, direction: .solid, color: color, alpha: alpha)
         if let _ = self.dimmerActivityView {
             // already loading
         } else {
