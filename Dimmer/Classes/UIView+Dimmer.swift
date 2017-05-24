@@ -154,7 +154,7 @@ extension UIView {
         }
     }
     
-    open func dim(_ direction: DimmerEffectDirection = .solid, ratio: CGFloat = 1, alpha: CGFloat = 0.4, completion: ((CGFloat) -> Void)? = nil) {
+    open func dim(animated: Bool = true, direction: DimmerEffectDirection = .solid, ratio: CGFloat = 1, alpha: CGFloat = 0.4, completion: ((CGFloat) -> Void)? = nil) {
         
         let updateRatio: (() -> Void) = {
             if self.dimmingRatio != ratio {
@@ -174,7 +174,11 @@ extension UIView {
             updateRatio()
         } else {
             let dimmer = createDimmerView(alpha: alpha)
-            fadeInSubview(dimmer)
+            if animated {
+                fadeInSubview(dimmer)
+            } else {
+                addSubview(dimmer)
+            }
             dimmerConstraints = NSLayoutConstraint.autoCreateConstraintsWithoutInstalling {
                 if direction == .solid {
                     dimmer.autoPinEdgesToSuperviewEdges()
@@ -196,14 +200,19 @@ extension UIView {
         }
     }
     
-    open func undim() {
-        dimmerView?.fadeOutFromSuperview(completion: {
-            self.clearKVO()
-        })
+    open func undim(animated: Bool = true) {
+        if animated {
+            dimmerView?.fadeOutFromSuperview(completion: {
+                self.clearKVO()
+            })
+        } else {
+            dimmerView?.removeFromSuperview()
+            clearKVO()
+        }
     }
     
-    open func showLoading(alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
-        dim(.solid, alpha: alpha)
+    open func showLoading(animated: Bool = true, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+        dim(animated: animated, direction: .solid, alpha: alpha)
         if let _ = self.dimmerActivityView {
             // already loading
         } else {
@@ -215,7 +224,7 @@ extension UIView {
         }
     }
     
-    open func hideLoading() {
-        undim()
+    open func hideLoading(animated: Bool = true) {
+        undim(animated: animated)
     }
 }
