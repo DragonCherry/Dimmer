@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Dimmer'
-  s.version          = '1.0.2'
-  s.summary          = 'Handy utility extension for UIView.'
+  s.version          = '1.1.0'
+  s.summary          = 'Handy utility extention supports both dimming & gradient effect on UIView.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
