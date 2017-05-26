@@ -98,9 +98,9 @@ extension UIView {
 // MARK: - Gradient
 extension UIView {
     
+    private var kUIViewGradientLayer: String { return "kUIViewGradientLayer" }
+    
     open func setGradient(_ direction: DimmerEffectDirection, start: CGFloat = 0, end: CGFloat = 1, color: UIColor) {
-        
-        let kUIViewGradientLayer: String = "kUIViewGradientLayer"
         
         // 1. init common variables
         let effectLayer = CAGradientLayer()
@@ -136,6 +136,13 @@ extension UIView {
             layer.addSublayer(effectLayer)
         }
         set(effectLayer, forKey: kUIViewGradientLayer)
+    }
+    
+    open func removeGradient() {
+        if let gradientLayer = get(kUIViewGradientLayer) as? CAGradientLayer {
+            gradientLayer.removeFromSuperlayer()
+            set(nil, forKey: kUIViewGradientLayer)
+        }
     }
 }
 
@@ -230,7 +237,7 @@ extension UIView {
                         break
                     }
                 }
-            } as NSArray
+                } as NSArray
             dimmerView = dimmer
             setupConstraints(constraints: dimmerConstraints)
             updateRatio()
