@@ -95,23 +95,60 @@ extension UIView {
     }
 }
 
-// MARK: - Exposed APIs
+// MARK: - Gradient
+extension UIView {
+    
+    open func setGradient(_ direction: DimmerEffectDirection, start: CGFloat = 0, end: CGFloat = 1, color: UIColor) {
+        
+        let kUIViewGradientLayer: String = "kUIViewGradientLayer"
+        
+        // 1. init common variables
+        let effectLayer = CAGradientLayer()
+        effectLayer.frame = bounds
+        effectLayer.colors = [
+            color.cgColor,
+            color.withAlphaComponent(0).cgColor
+        ]
+        
+        // 2. set for each style
+        switch direction {
+        case .fromTop:
+            effectLayer.startPoint = CGPoint(x: 0.5, y: start)
+            effectLayer.endPoint = CGPoint(x: 0.5, y: end)
+        case .fromLeft:
+            effectLayer.startPoint = CGPoint(x: start, y: 0.5)
+            effectLayer.endPoint = CGPoint(x: end, y: 0.5)
+        case .fromBottom:
+            effectLayer.startPoint = CGPoint(x: 0.5, y: 1 - start)
+            effectLayer.endPoint = CGPoint(x: 0.5, y: 1 - end)
+        case .fromRight:
+            effectLayer.startPoint = CGPoint(x: 1 - start, y: 0.5)
+            effectLayer.endPoint = CGPoint(x: 1 - end, y: 0.5)
+        default:
+            effectLayer.startPoint = CGPoint(x: 0.5, y: start)
+            effectLayer.endPoint = CGPoint(x: 0.5, y: end)
+        }
+        
+        // 3. check layer
+        if let oldLayer = get(kUIViewGradientLayer) as? CAGradientLayer {
+            layer.replaceSublayer(oldLayer, with: effectLayer)
+        } else {
+            layer.addSublayer(effectLayer)
+        }
+        set(effectLayer, forKey: kUIViewGradientLayer)
+    }
+}
+
+// MARK: - Dimming
 extension UIView {
     
     open var dimmingRatio: CGFloat {
         get { return CGFloat(get(kDimmerViewRatio)) }
         set { set(newValue, forKey: kDimmerViewRatio) }
     }
+    
     open var isDimming: Bool {
         if let dimmerView = dimmerView, !dimmerView.isHidden && dimmingRatio > 0 {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    open var isLoading: Bool {
-        if let _ = get(kDimmerActivityIndicatorView), dimmingRatio > 0 {
             return true
         } else {
             return false
@@ -208,6 +245,18 @@ extension UIView {
         } else {
             dimmerView?.removeFromSuperview()
             clearKVO()
+        }
+    }
+}
+
+// MARK: - Loading
+extension UIView {
+    
+    open var isLoading: Bool {
+        if let _ = get(kDimmerActivityIndicatorView), dimmingRatio > 0 {
+            return true
+        } else {
+            return false
         }
     }
     
