@@ -100,13 +100,13 @@ extension UIView {
     
     private var kUIViewGradientLayer: String { return "kUIViewGradientLayer" }
     
-    open func setGradient(_ direction: DimmerEffectDirection, start: CGFloat = 0, end: CGFloat = 1, color: UIColor) {
+    open func setGradient(_ direction: DimmerEffectDirection, start: CGFloat = 0, end: CGFloat = 1, startAlpha: CGFloat = 1, color: UIColor) {
         
         // 1. init common variables
         let effectLayer = CAGradientLayer()
         effectLayer.frame = bounds
         effectLayer.colors = [
-            color.cgColor,
+            color.withAlphaComponent(startAlpha).cgColor,
             color.withAlphaComponent(0).cgColor
         ]
         
@@ -131,10 +131,9 @@ extension UIView {
         
         // 3. check layer
         if let oldLayer = get(kUIViewGradientLayer) as? CAGradientLayer {
-            layer.replaceSublayer(oldLayer, with: effectLayer)
-        } else {
-            layer.addSublayer(effectLayer)
+            oldLayer.removeFromSuperlayer()
         }
+        layer.addSublayer(effectLayer)
         set(effectLayer, forKey: kUIViewGradientLayer)
     }
     
