@@ -11,7 +11,6 @@ import TinyLog
 import UIViewKVO
 import FadeView
 import PureLayout
-import OptionalTypes
 
 fileprivate let kDimmerView                             = "kDimmerView"
 fileprivate let kDimmerViewRatio                        = "kDimmerViewRatio"
@@ -149,7 +148,7 @@ extension UIView {
 extension UIView {
     
     open var dimmingRatio: CGFloat {
-        get { return CGFloat(get(kDimmerViewRatio)) }
+        get { return CGFloat((get(kDimmerViewRatio) as? CGFloat) ?? 0) }
         set { set(newValue, forKey: kDimmerViewRatio) }
     }
     
