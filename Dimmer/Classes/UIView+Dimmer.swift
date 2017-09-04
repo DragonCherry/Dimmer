@@ -270,13 +270,20 @@ extension UIView {
         if let _ = self.dimmerActivityView {
             // already loading
         } else if let view = customView {
-            fadeInSubview(view)
+            if animated {
+                fadeInSubview(view)
+            } else {
+                addSubview(view)
+            }
             view.autoCenterInSuperview()
-            view.startAnimating()
             dimmerActivityView = view
         } else {
             let dimmerActivity = createDimmerActivityView(style: style)
-            fadeInSubview(dimmerActivity)
+            if animated {
+                fadeInSubview(dimmerActivity)
+            } else {
+                addSubview(dimmerActivity)
+            }
             dimmerActivity.autoCenterInSuperview()
             dimmerActivity.startAnimating()
             dimmerActivityView = dimmerActivity
