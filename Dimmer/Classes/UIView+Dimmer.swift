@@ -265,10 +265,15 @@ extension UIView {
         }
     }
     
-    open func showLoading(animated: Bool = true, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+    open func showLoading(animated: Bool = true, customView: UIView? = nil, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
         dim(animated: animated, direction: .solid, color: color, alpha: alpha)
         if let _ = self.dimmerActivityView {
             // already loading
+        } else if let view = customView {
+            fadeInSubview(view)
+            view.autoCenterInSuperview()
+            view.startAnimating()
+            dimmerActivityView = view
         } else {
             let dimmerActivity = createDimmerActivityView(style: style)
             fadeInSubview(dimmerActivity)
