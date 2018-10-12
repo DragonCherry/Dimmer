@@ -59,8 +59,8 @@ extension UIView {
         return view
     }
     
-    fileprivate func createDimmerActivityView(style: UIActivityIndicatorViewStyle = .gray) -> UIActivityIndicatorView {
-        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: style)
+    fileprivate func createDimmerActivityView(style: UIActivityIndicatorView.Style = .gray) -> UIActivityIndicatorView {
+        let activityIndicator = UIActivityIndicatorView(style: style)
         return activityIndicator
     }
     
@@ -265,7 +265,7 @@ extension UIView {
         }
     }
     
-    open func showLoading(animated: Bool = true, customView: UIView? = nil, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+    open func showLoading(animated: Bool = true, customView: UIView? = nil, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorView.Style = .gray) {
         dim(animated: animated, direction: .solid, color: color, alpha: alpha)
         if let _ = self.dimmerActivityView {
             // already loading
