@@ -61,7 +61,7 @@ extension UIView {
     }
     
     fileprivate func createDimmerActivityView(style: UIActivityIndicatorView.Style = .gray) -> UIActivityIndicatorView {
-        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: style)
+        let activityIndicator = UIActivityIndicatorView(style: style)
         return activityIndicator
     }
     
