@@ -12,6 +12,7 @@ import UIViewKVO
 import FadeView
 import PureLayout
 
+fileprivate let kDimmerViewKey                          = "kDimmerViewKey"
 fileprivate let kDimmerView                             = "kDimmerView"
 fileprivate let kDimmerViewRatio                        = "kDimmerViewRatio"
 fileprivate let kDimmerActivityIndicatorView            = "kDimmerActivityIndicatorView"
@@ -59,7 +60,7 @@ extension UIView {
         return view
     }
     
-    fileprivate func createDimmerActivityView(style: UIActivityIndicatorViewStyle = .gray) -> UIActivityIndicatorView {
+    fileprivate func createDimmerActivityView(style: UIActivityIndicatorView.Style = .gray) -> UIActivityIndicatorView {
         let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: style)
         return activityIndicator
     }
@@ -88,7 +89,7 @@ extension UIView {
         dimmerWidthConstraint = nil
         dimmerHeightConstraint = nil
         
-        set(nil, forKey: kDimmerView)
+        set(nil, forKey: dimmerKey ?? kDimmerView)
         set(nil, forKey: kDimmerActivityIndicatorView)
         set(nil, forKey: kDimmerViewRatio)
     }
@@ -147,6 +148,11 @@ extension UIView {
 // MARK: - Dimming
 extension UIView {
     
+    var dimmerKey: String? {
+        get { return get(kDimmerViewKey) as? String }
+        set { set(newValue, forKey: kDimmerViewKey) }
+    }
+    
     open var dimmingRatio: CGFloat {
         get { return CGFloat((get(kDimmerViewRatio) as? CGFloat) ?? 0) }
         set { set(newValue, forKey: kDimmerViewRatio) }
@@ -161,7 +167,7 @@ extension UIView {
     }
     
     open var dimmerView: UIView? {
-        get { return get(kDimmerView) as? UIView }
+        get { return get(dimmerKey ?? kDimmerView) as? UIView }
         set {
             if let newDimmerView = newValue {
                 if let oldDimmerView = dimmerView {
@@ -169,7 +175,7 @@ extension UIView {
                         clearKVO()
                     }
                 }
-                set(newDimmerView, forKey: kDimmerView)
+                set(newDimmerView, forKey: dimmerKey ?? kDimmerView)
             } else {
                 if let _ = dimmerView {
                     clearKVO()
@@ -196,7 +202,7 @@ extension UIView {
         }
     }
     
-    open func dim(animated: Bool = true, direction: DimmerEffectDirection = .solid, color: UIColor = .black, alpha: CGFloat = 0.4, ratio: CGFloat = 1, completion: ((CGFloat) -> Void)? = nil) {
+    open func dim(animated: Bool = true, direction: DimmerEffectDirection = .solid, color: UIColor = .black, alpha: CGFloat = 0.5, ratio: CGFloat = 1, completion: ((CGFloat) -> Void)? = nil) {
         
         let updateRatio: (() -> Void) = {
             if self.dimmingRatio != ratio {
@@ -265,7 +271,7 @@ extension UIView {
         }
     }
     
-    open func showLoading(animated: Bool = true, customView: UIView? = nil, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorViewStyle = .gray) {
+    open func showLoading(animated: Bool = true, customView: UIView? = nil, color: UIColor = .black, alpha: CGFloat = 0.4, style: UIActivityIndicatorView.Style = .gray) {
         dim(animated: animated, direction: .solid, color: color, alpha: alpha)
         if let _ = self.dimmerActivityView {
             // already loading
@@ -294,3 +300,5 @@ extension UIView {
         undim(animated: animated)
     }
 }
+
+
