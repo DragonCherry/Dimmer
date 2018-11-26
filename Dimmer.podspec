@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Dimmer'
-  s.version          = '2.1.1'
+  s.version          = '2.2.0'
   s.summary          = 'Handy utility extention supports both dimming & gradient effect on UIView.'
 
 # This description is used to generate tags and improve search results.
@@ -40,6 +40,5 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'UIViewKVO', '~> 2.0'
   s.dependency 'FadeView', '~> 2.0'
-  s.dependency 'TinyLog', '~> 2.0'
-  s.dependency 'PureLayout'
+  s.dependency 'SnapKit'
 end
